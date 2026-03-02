@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
 import { FileText, Menu, X, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -23,11 +24,22 @@ export const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   const navLinks = [
-    { name: 'Home', href: '/' },
     { 
       name: 'PDF Tools', 
-      href: '/#tools',
+      href: '#',
       dropdown: [
         { name: 'Unlock PDF', href: '/tools/unlock-pdf' },
         { name: 'PDF to Image', href: '/tools/pdf-to-image' },
@@ -37,7 +49,7 @@ export const Navbar = () => {
     },
     { 
       name: 'Calculators', 
-      href: '/#calculators',
+      href: '#',
       dropdown: [
         { name: 'EMI Calculator', href: '/calculators/emi' },
         { name: 'GST Calculator', href: '/calculators/gst' },
@@ -45,18 +57,39 @@ export const Navbar = () => {
         { name: 'Age Calculator', href: '/calculators/age' },
       ]
     },
-    { name: 'About', href: '/about' },
-    { name: 'Contact', href: '/contact' },
+    { 
+      name: 'Company', 
+      href: '#',
+      dropdown: [
+        { name: 'About Us', href: '/about' },
+        { name: 'Contact', href: '/contact' },
+      ]
+    },
+    { 
+      name: 'Legal', 
+      href: '#',
+      dropdown: [
+        { name: 'Privacy Policy', href: '/privacy' },
+        { name: 'Terms of Service', href: '/terms' },
+        { name: 'Sitemap', href: '/sitemap.xml' },
+      ]
+    },
   ];
 
   const isActive = (path: string) => {
-    if (path.startsWith('/#')) return false;
+    if (path === '#' || path.startsWith('/#')) return false;
     return location.pathname === path;
+  };
+
+  const isGroupActive = (dropdown?: { href: string }[]) => {
+    if (!dropdown) return false;
+    return dropdown.some(item => location.pathname === item.href);
   };
 
   return (
     <nav className={cn(
-      "fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b",
+      "fixed top-0 left-0 right-0 transition-all duration-300 border-b",
+      isOpen ? "z-[9999]" : "z-50",
       scrolled 
         ? "bg-navy-900/80 backdrop-blur-xl border-white/10 py-3" 
         : "bg-transparent border-transparent py-5"
@@ -81,7 +114,7 @@ export const Navbar = () => {
                   to={link.href}
                   className={cn(
                     "text-sm font-medium transition-colors flex items-center gap-1",
-                    isActive(link.href) ? "text-white" : "text-slate-400 hover:text-white"
+                    isGroupActive(link.dropdown) || isActive(link.href) ? "text-white" : "text-slate-400 hover:text-white"
                   )}
                 >
                   {link.name}
@@ -89,7 +122,7 @@ export const Navbar = () => {
                 </Link>
                 
                 {/* Active Underline */}
-                {isActive(link.href) && (
+                {(isGroupActive(link.dropdown) || isActive(link.href)) && (
                   <motion.div
                     layoutId="nav-underline"
                     className="absolute bottom-0 left-3 right-3 h-0.5 bg-gradient-to-r from-accent-purple to-accent-blue"
@@ -133,77 +166,83 @@ export const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Nav Drawer */}
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
-            />
-            
-            {/* Drawer */}
-            <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 w-[300px] bg-navy-900 border-l border-white/10 z-50 lg:hidden overflow-y-auto"
-            >
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-10">
-                  <span className="font-bold text-lg">Menu</span>
-                  <button onClick={() => setIsOpen(false)} className="text-slate-400 p-2">
-                    <X className="w-6 h-6" />
-                  </button>
-                </div>
-
-                <div className="space-y-6">
-                  {navLinks.map((link) => (
-                    <div key={link.name} className="space-y-3">
-                      <Link
-                        to={link.href}
-                        className={cn(
-                          "block text-lg font-semibold",
-                          isActive(link.href) ? "text-accent-purple" : "text-white"
-                        )}
-                      >
-                        {link.name}
-                      </Link>
-                      
-                      {link.dropdown && (
-                        <div className="pl-4 space-y-3 border-l border-white/5">
-                          {link.dropdown.map((item) => (
-                            <Link
-                              key={item.name}
-                              to={item.href}
-                              className="block text-sm text-slate-400 hover:text-white"
-                            >
-                              {item.name}
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                  <div className="pt-6">
-                    <Link
-                      to="/#tools"
-                      className="block w-full text-center btn-primary py-3"
+      {/* Mobile Nav Drawer using Portal */}
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {isOpen && (
+            <div className="fixed inset-0 z-[99999] lg:hidden">
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsOpen(false)}
+                className="absolute inset-0 bg-black/60 backdrop-blur-md"
+              />
+              
+              {/* Drawer */}
+              <motion.div
+                initial={{ x: '100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '100%' }}
+                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                className="absolute top-0 right-0 bottom-0 w-full sm:w-[350px] bg-navy-900 border-l border-white/10 overflow-y-auto shadow-2xl"
+              >
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-10">
+                    <span className="font-bold text-lg text-white">Menu</span>
+                    <button 
+                      onClick={() => setIsOpen(false)} 
+                      className="text-slate-400 p-2 hover:text-white transition-colors"
                     >
-                      Get Started
-                    </Link>
+                      <X className="w-6 h-6" />
+                    </button>
+                  </div>
+
+                  <div className="space-y-6">
+                    {navLinks.map((link) => (
+                      <div key={link.name} className="space-y-3 pb-4 border-b border-white/5 last:border-0">
+                        <div className={cn(
+                          "text-xs font-bold uppercase tracking-widest text-slate-500 mb-2",
+                          isGroupActive(link.dropdown) && "text-accent-purple"
+                        )}>
+                          {link.name}
+                        </div>
+                        
+                        {link.dropdown && (
+                          <div className="grid grid-cols-1 gap-3">
+                            {link.dropdown.map((item) => (
+                              <Link
+                                key={item.name}
+                                to={item.href}
+                                className={cn(
+                                  "block text-base font-medium transition-colors",
+                                  isActive(item.href) ? "text-white" : "text-slate-400 hover:text-white"
+                                )}
+                              >
+                                {item.name}
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    <div className="pt-4">
+                      <Link
+                        to="/#tools"
+                        className="block w-full text-center btn-primary py-4 rounded-2xl"
+                      >
+                        Get Started Free
+                      </Link>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </nav>
   );
 };

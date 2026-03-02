@@ -3,8 +3,10 @@ import { motion } from 'framer-motion';
 import { Upload, FileText, Download, Loader2, Image as ImageIcon, X, AlertCircle } from 'lucide-react';
 import * as pdfjsLib from 'pdfjs-dist';
 
-// Configure pdf.js worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+// Configure pdf.js worker using Vite's worker loader
+// @ts-ignore - Vite handles this import correctly at runtime
+import pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 
 export const PDFToImage = () => {
   const [file, setFile] = React.useState<File | null>(null);
@@ -28,7 +30,14 @@ export const PDFToImage = () => {
 
     try {
       const arrayBuffer = await file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+      
+      loadingTask.onPassword = (updatePassword: (password: string) => void) => {
+        const password = prompt('This PDF is password protected. Please enter the password:');
+        if (password) updatePassword(password);
+      };
+
+      const pdf = await loadingTask.promise;
       const numPages = pdf.numPages;
       const imageUrls: string[] = [];
 
@@ -56,7 +65,11 @@ export const PDFToImage = () => {
       setImages(imageUrls);
     } catch (err: any) {
       console.error(err);
-      setError('Failed to convert PDF to images. Please ensure the file is not corrupted.');
+      if (err.name === 'PasswordException') {
+        setError('Incorrect password or password required.');
+      } else {
+        setError('Failed to convert PDF to images. The file might be corrupted or unsupported.');
+      }
     } finally {
       setIsProcessing(false);
     }

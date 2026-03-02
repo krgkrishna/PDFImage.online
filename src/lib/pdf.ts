@@ -5,22 +5,42 @@ export async function unlockPdf(file: File, password?: string) {
   const arrayBuffer = await file.arrayBuffer();
   try {
     // @ts-ignore - pdf-lib types sometimes lag behind or have strict load options
-    const pdfDoc = await PDFDocument.load(arrayBuffer, { password });
+    const pdfDoc = await PDFDocument.load(arrayBuffer, { 
+      password,
+      ignoreEncryption: false 
+    } as any);
     const savedBytes = await pdfDoc.save();
     return new Blob([savedBytes], { type: 'application/pdf' });
-  } catch (error) {
-    throw new Error('Invalid password or corrupted PDF');
+  } catch (error: any) {
+    if (error.message.includes('password')) {
+      throw new Error('Incorrect password. Please try again.');
+    }
+    throw new Error('Failed to unlock PDF. The file might be corrupted or not encrypted.');
   }
 }
 
 export async function compressPdf(file: File) {
-  // Client-side PDF compression is tricky with pdf-lib alone.
-  // A common approach is to re-save with optimizations or use a worker.
-  // For this demo, we'll re-save the document which often reduces size slightly
-  // by removing metadata/incremental updates.
   const arrayBuffer = await file.arrayBuffer();
   const pdfDoc = await PDFDocument.load(arrayBuffer);
-  const savedBytes = await pdfDoc.save({ useObjectStreams: true });
+  
+  // Create a new document to copy pages into (often reduces size)
+  const compressedDoc = await PDFDocument.create();
+  const pages = await compressedDoc.copyPages(pdfDoc, pdfDoc.getPageIndices());
+  pages.forEach((page) => compressedDoc.addPage(page));
+  
+  // Save with optimizations
+  const savedBytes = await compressedDoc.save({ 
+    useObjectStreams: true,
+    addDefaultPage: false
+  });
+  
+  const originalSize = file.size;
+  const compressedSize = savedBytes.length;
+  
+  if (compressedSize >= originalSize) {
+    throw new Error('This PDF is already highly optimized. No further compression possible.');
+  }
+  
   return new Blob([savedBytes], { type: 'application/pdf' });
 }
 

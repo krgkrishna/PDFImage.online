@@ -9,6 +9,8 @@ import { ImageToPDF } from './pages/ImageToPDF';
 import { PDFToImage } from './pages/PDFToImage';
 import { EMICalculator } from './pages/EMICalculator';
 import { GSTCalculator } from './pages/GSTCalculator';
+import { BMICalculator } from './pages/BMICalculator';
+import { AgeCalculator } from './pages/AgeCalculator';
 import { About } from './pages/About';
 import { Contact } from './pages/Contact';
 import { Privacy } from './pages/Privacy';
@@ -38,8 +40,8 @@ export default function App() {
               <Route path="/tools/pdf-to-image" element={<PDFToImage />} />
               <Route path="/calculators/emi" element={<EMICalculator />} />
               <Route path="/calculators/gst" element={<GSTCalculator />} />
-              <Route path="/calculators/bmi" element={<Placeholder title="BMI Calculator" />} />
-              <Route path="/calculators/age" element={<Placeholder title="Age Calculator" />} />
+              <Route path="/calculators/bmi" element={<BMICalculator />} />
+              <Route path="/calculators/age" element={<AgeCalculator />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/privacy" element={<Privacy />} />

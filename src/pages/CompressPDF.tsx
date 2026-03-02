@@ -9,24 +9,27 @@ export const CompressPDF = () => {
   const [result, setResult] = React.useState<Blob | null>(null);
   const [originalSize, setOriginalSize] = React.useState(0);
   const [newSize, setNewSize] = React.useState(0);
+  const [error, setError] = React.useState('');
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
       setOriginalSize(e.target.files[0].size);
       setResult(null);
+      setError('');
     }
   };
 
   const handleProcess = async () => {
     if (!file) return;
     setIsProcessing(true);
+    setError('');
     try {
       const compressed = await compressPdf(file);
       setResult(compressed);
       setNewSize(compressed.size);
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      setError(err.message || 'Failed to compress PDF');
     } finally {
       setIsProcessing(false);
     }
@@ -82,11 +85,18 @@ export const CompressPDF = () => {
             </div>
 
             {!result ? (
-              <button
-                onClick={handleProcess}
-                disabled={isProcessing}
-                className="btn-primary w-full flex items-center justify-center"
-              >
+              <>
+                {error && (
+                  <div className="flex items-center p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm mb-4">
+                    <AlertCircle className="w-4 h-4 mr-2" />
+                    {error}
+                  </div>
+                )}
+                <button
+                  onClick={handleProcess}
+                  disabled={isProcessing}
+                  className="btn-primary w-full flex items-center justify-center"
+                >
                 {isProcessing ? (
                   <>
                     <Loader2 className="w-5 h-5 mr-2 animate-spin" />
@@ -96,6 +106,7 @@ export const CompressPDF = () => {
                   'Compress PDF'
                 )}
               </button>
+              </>
             ) : (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}

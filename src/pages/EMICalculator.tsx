@@ -30,7 +30,12 @@ export const EMICalculator = () => {
               <div>
                 <div className="flex justify-between mb-2">
                   <label className="text-sm font-medium text-slate-400">Loan Amount</label>
-                  <span className="text-accent-purple font-bold">{formatCurrency(principal)}</span>
+                  <input
+                    type="number"
+                    value={principal}
+                    onChange={(e) => setPrincipal(Number(e.target.value))}
+                    className="bg-transparent text-right text-accent-purple font-bold focus:outline-none w-32"
+                  />
                 </div>
                 <input
                   type="range"
@@ -46,7 +51,13 @@ export const EMICalculator = () => {
               <div>
                 <div className="flex justify-between mb-2">
                   <label className="text-sm font-medium text-slate-400">Interest Rate (%)</label>
-                  <span className="text-accent-purple font-bold">{rate}%</span>
+                  <input
+                    type="number"
+                    value={rate}
+                    onChange={(e) => setRate(Number(e.target.value))}
+                    className="bg-transparent text-right text-accent-purple font-bold focus:outline-none w-20"
+                    step="0.1"
+                  />
                 </div>
                 <input
                   type="range"
@@ -62,7 +73,12 @@ export const EMICalculator = () => {
               <div>
                 <div className="flex justify-between mb-2">
                   <label className="text-sm font-medium text-slate-400">Tenure (Months)</label>
-                  <span className="text-accent-purple font-bold">{tenure} Months</span>
+                  <input
+                    type="number"
+                    value={tenure}
+                    onChange={(e) => setTenure(Number(e.target.value))}
+                    className="bg-transparent text-right text-accent-purple font-bold focus:outline-none w-20"
+                  />
                 </div>
                 <input
                   type="range"
