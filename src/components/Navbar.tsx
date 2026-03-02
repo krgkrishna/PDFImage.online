@@ -41,20 +41,20 @@ export const Navbar = () => {
       name: 'PDF Tools', 
       href: '#',
       dropdown: [
-        { name: 'Unlock PDF', href: '/tools/unlock-pdf' },
-        { name: 'PDF to Image', href: '/tools/pdf-to-image' },
-        { name: 'Compress PDF', href: '/tools/compress-pdf' },
-        { name: 'Image to PDF', href: '/tools/image-to-pdf' },
+        { name: 'Unlock PDF', href: '/unlock' },
+        { name: 'PDF to Image', href: '/pdf-to-image' },
+        { name: 'Compress PDF', href: '/compress' },
+        { name: 'Image to PDF', href: '/image-to-pdf' },
       ]
     },
     { 
       name: 'Calculators', 
       href: '#',
       dropdown: [
-        { name: 'EMI Calculator', href: '/calculators/emi' },
-        { name: 'GST Calculator', href: '/calculators/gst' },
-        { name: 'BMI Calculator', href: '/calculators/bmi' },
-        { name: 'Age Calculator', href: '/calculators/age' },
+        { name: 'EMI Calculator', href: '/emi' },
+        { name: 'GST Calculator', href: '/gst' },
+        { name: 'BMI Calculator', href: '/bmi' },
+        { name: 'Age Calculator', href: '/age' },
       ]
     },
     { 
@@ -63,6 +63,8 @@ export const Navbar = () => {
       dropdown: [
         { name: 'About Us', href: '/about' },
         { name: 'Contact', href: '/contact' },
+        { name: 'Blog', href: '/blog' },
+        { name: 'Careers', href: '/careers' },
       ]
     },
     { 
@@ -71,7 +73,8 @@ export const Navbar = () => {
       dropdown: [
         { name: 'Privacy Policy', href: '/privacy' },
         { name: 'Terms of Service', href: '/terms' },
-        { name: 'Sitemap', href: '/sitemap.xml' },
+        { name: 'Cookie Policy', href: '/cookies' },
+        { name: 'Security', href: '/security' },
       ]
     },
   ];
@@ -97,13 +100,35 @@ export const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-accent-purple to-accent-blue rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:scale-110 transition-transform">
-              <FileText className="text-white w-6 h-6" />
+          <Link to="/" className="flex items-center space-x-3 group relative">
+            <motion.div 
+              whileHover={{ scale: 1.1, rotate: 5 }}
+              whileTap={{ scale: 0.95 }}
+              className="relative"
+            >
+              <div className="w-11 h-11 bg-gradient-to-br from-accent-purple to-accent-blue rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow">
+                <FileText className="text-white w-6 h-6" />
+              </div>
+              {/* Glow effect */}
+              <div className="absolute inset-0 bg-accent-purple/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+            </motion.div>
+            
+            <div className="flex flex-col">
+              <span className={cn(
+                "text-xl font-extrabold tracking-tight transition-all duration-300",
+                location.pathname === '/' 
+                  ? "bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-accent-purple" 
+                  : "text-white group-hover:text-accent-purple"
+              )}>
+                PDFImage Online
+              </span>
+              {location.pathname === '/' && (
+                <motion.div 
+                  layoutId="logo-active"
+                  className="h-0.5 w-full bg-gradient-to-r from-accent-purple to-accent-blue rounded-full mt-0.5"
+                />
+              )}
             </div>
-            <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60">
-              PDFImage Online
-            </span>
           </Link>
 
           {/* Desktop Nav */}
@@ -113,7 +138,7 @@ export const Navbar = () => {
                 <Link
                   to={link.href}
                   className={cn(
-                    "text-sm font-medium transition-colors flex items-center gap-1",
+                    "text-sm font-semibold tracking-wide transition-colors flex items-center gap-1.5",
                     isGroupActive(link.dropdown) || isActive(link.href) ? "text-white" : "text-slate-400 hover:text-white"
                   )}
                 >
@@ -125,19 +150,24 @@ export const Navbar = () => {
                 {(isGroupActive(link.dropdown) || isActive(link.href)) && (
                   <motion.div
                     layoutId="nav-underline"
-                    className="absolute bottom-0 left-3 right-3 h-0.5 bg-gradient-to-r from-accent-purple to-accent-blue"
+                    className="absolute bottom-0 left-3 right-3 h-0.5 bg-gradient-to-r from-accent-purple to-accent-blue rounded-full"
                   />
                 )}
 
                 {/* Dropdown Menu */}
                 {link.dropdown && (
-                  <div className="absolute top-full left-0 pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200">
-                    <div className="glass-card p-2 min-w-[200px] shadow-2xl">
+                  <div className="absolute top-full left-0 pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-300">
+                    <div className="glass-card p-2 min-w-[220px] shadow-2xl border-white/10">
                       {link.dropdown.map((item) => (
                         <Link
                           key={item.name}
                           to={item.href}
-                          className="block px-4 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                          className={cn(
+                            "block px-4 py-2.5 text-sm font-medium rounded-xl transition-all",
+                            isActive(item.href) 
+                              ? "bg-white/10 text-white" 
+                              : "text-slate-400 hover:text-white hover:bg-white/5"
+                          )}
                         >
                           {item.name}
                         </Link>
@@ -147,10 +177,15 @@ export const Navbar = () => {
                 )}
               </div>
             ))}
-            <div className="pl-4">
-              <Link to="/#tools" className="btn-primary py-2 px-6 text-sm">
-                Get Started
-              </Link>
+            <div className="pl-6">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Link to="/#tools" className="btn-primary py-2.5 px-8 text-sm tracking-wider uppercase font-bold">
+                  Get Started
+                </Link>
+              </motion.div>
             </div>
           </div>
 
@@ -203,7 +238,7 @@ export const Navbar = () => {
                     {navLinks.map((link) => (
                       <div key={link.name} className="space-y-3 pb-4 border-b border-white/5 last:border-0">
                         <div className={cn(
-                          "text-xs font-bold uppercase tracking-widest text-slate-500 mb-2",
+                          "text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2",
                           isGroupActive(link.dropdown) && "text-accent-purple"
                         )}>
                           {link.name}
@@ -215,8 +250,9 @@ export const Navbar = () => {
                               <Link
                                 key={item.name}
                                 to={item.href}
+                                onClick={() => setIsOpen(false)}
                                 className={cn(
-                                  "block text-base font-medium transition-colors",
+                                  "block text-lg font-bold transition-colors",
                                   isActive(item.href) ? "text-white" : "text-slate-400 hover:text-white"
                                 )}
                               >
@@ -227,13 +263,18 @@ export const Navbar = () => {
                         )}
                       </div>
                     ))}
-                    <div className="pt-4">
-                      <Link
-                        to="/#tools"
-                        className="block w-full text-center btn-primary py-4 rounded-2xl"
+                    <div className="pt-6">
+                      <motion.div
+                        whileTap={{ scale: 0.98 }}
                       >
-                        Get Started Free
-                      </Link>
+                        <Link
+                          to="/#tools"
+                          onClick={() => setIsOpen(false)}
+                          className="block w-full text-center btn-primary py-5 rounded-2xl text-lg font-black tracking-widest uppercase"
+                        >
+                          Get Started Free
+                        </Link>
+                      </motion.div>
                     </div>
                   </div>
                 </div>

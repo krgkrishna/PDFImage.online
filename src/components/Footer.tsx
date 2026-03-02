@@ -1,31 +1,35 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FileText, Github, Twitter, Linkedin } from 'lucide-react';
+import { cn } from '../utils/utils';
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const location = useLocation();
+
+  const isActive = (path: string) => location.pathname === path;
 
   const footerLinks = {
     tools: [
-      { name: 'Unlock PDF', href: '/tools/unlock-pdf' },
-      { name: 'PDF to Image', href: '/tools/pdf-to-image' },
-      { name: 'Compress PDF', href: '/tools/compress-pdf' },
-      { name: 'Image to PDF', href: '/tools/image-to-pdf' },
-      { name: 'EMI Calculator', href: '/calculators/emi' },
-      { name: 'GST Calculator', href: '/calculators/gst' },
+      { name: 'Unlock PDF', href: '/unlock' },
+      { name: 'PDF to Image', href: '/pdf-to-image' },
+      { name: 'Compress PDF', href: '/compress' },
+      { name: 'Image to PDF', href: '/image-to-pdf' },
+      { name: 'EMI Calculator', href: '/emi' },
+      { name: 'GST Calculator', href: '/gst' },
     ],
     company: [
       { name: 'About Us', href: '/about' },
       { name: 'Contact', href: '/contact' },
-      { name: 'Blog', href: '#' },
-      { name: 'Careers', href: '#' },
+      { name: 'Blog', href: '/blog' },
+      { name: 'Careers', href: '/careers' },
     ],
     legal: [
       { name: 'Privacy Policy', href: '/privacy' },
       { name: 'Terms of Service', href: '/terms' },
-      { name: 'Cookie Policy', href: '#' },
-      { name: 'Security', href: '#' },
+      { name: 'Cookie Policy', href: '/cookies' },
+      { name: 'Security', href: '/security' },
     ],
   };
 
@@ -45,13 +49,27 @@ export const Footer = () => {
           >
             {/* Brand Column */}
             <div className="col-span-1 md:col-span-1">
-              <Link to="/" className="flex items-center space-x-2 mb-6 group">
-                <div className="w-9 h-9 bg-gradient-to-br from-accent-purple to-accent-blue rounded-lg flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:scale-105 transition-transform duration-300">
-                  <FileText className="text-white w-5 h-5" />
+              <Link to="/" className="flex items-center space-x-3 mb-6 group relative inline-flex">
+                <motion.div 
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="relative"
+                >
+                  <div className="w-10 h-10 bg-gradient-to-br from-accent-purple to-accent-blue rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow">
+                    <FileText className="text-white w-5 h-5" />
+                  </div>
+                </motion.div>
+                <div className="flex flex-col">
+                  <span className="text-xl font-extrabold tracking-tight text-white group-hover:text-accent-purple transition-colors">
+                    PDFImage Online
+                  </span>
+                  {location.pathname === '/' && (
+                    <motion.div 
+                      layoutId="footer-logo-active"
+                      className="h-0.5 w-full bg-gradient-to-r from-accent-purple to-accent-blue rounded-full mt-0.5"
+                    />
+                  )}
                 </div>
-                <span className="text-xl font-bold tracking-tight text-white">
-                  PDFImage<span className="text-accent-purple">.</span>
-                </span>
               </Link>
               <p className="text-slate-500 text-sm leading-relaxed mb-8 max-w-xs">
                 Professional-grade digital tools, processed entirely in your browser for maximum privacy and speed.
@@ -78,10 +96,18 @@ export const Footer = () => {
                     <li key={link.name}>
                       <Link 
                         to={link.href} 
-                        className="text-slate-400 hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-accent-purple hover:to-accent-blue transition-all duration-300 text-sm font-medium relative group inline-block"
+                        className={cn(
+                          "transition-all duration-300 text-sm font-medium relative group inline-block",
+                          isActive(link.href) 
+                            ? "text-transparent bg-clip-text bg-gradient-to-r from-accent-purple to-accent-blue" 
+                            : "text-slate-400 hover:text-white"
+                        )}
                       >
                         {link.name}
-                        <span className="absolute -bottom-1 left-0 w-0 h-px bg-gradient-to-r from-accent-purple to-accent-blue transition-all duration-300 group-hover:w-full" />
+                        <span className={cn(
+                          "absolute -bottom-1 left-0 h-px bg-gradient-to-r from-accent-purple to-accent-blue transition-all duration-300",
+                          isActive(link.href) ? "w-full" : "w-0 group-hover:w-full"
+                        )} />
                       </Link>
                     </li>
                   ))}
@@ -95,10 +121,18 @@ export const Footer = () => {
                     <li key={link.name}>
                       <Link 
                         to={link.href} 
-                        className="text-slate-400 hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-accent-purple hover:to-accent-blue transition-all duration-300 text-sm font-medium relative group inline-block"
+                        className={cn(
+                          "transition-all duration-300 text-sm font-medium relative group inline-block",
+                          isActive(link.href) 
+                            ? "text-transparent bg-clip-text bg-gradient-to-r from-accent-purple to-accent-blue" 
+                            : "text-slate-400 hover:text-white"
+                        )}
                       >
                         {link.name}
-                        <span className="absolute -bottom-1 left-0 w-0 h-px bg-gradient-to-r from-accent-purple to-accent-blue transition-all duration-300 group-hover:w-full" />
+                        <span className={cn(
+                          "absolute -bottom-1 left-0 h-px bg-gradient-to-r from-accent-purple to-accent-blue transition-all duration-300",
+                          isActive(link.href) ? "w-full" : "w-0 group-hover:w-full"
+                        )} />
                       </Link>
                     </li>
                   ))}
@@ -112,10 +146,18 @@ export const Footer = () => {
                     <li key={link.name}>
                       <Link 
                         to={link.href} 
-                        className="text-slate-400 hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-accent-purple hover:to-accent-blue transition-all duration-300 text-sm font-medium relative group inline-block"
+                        className={cn(
+                          "transition-all duration-300 text-sm font-medium relative group inline-block",
+                          isActive(link.href) 
+                            ? "text-transparent bg-clip-text bg-gradient-to-r from-accent-purple to-accent-blue" 
+                            : "text-slate-400 hover:text-white"
+                        )}
                       >
                         {link.name}
-                        <span className="absolute -bottom-1 left-0 w-0 h-px bg-gradient-to-r from-accent-purple to-accent-blue transition-all duration-300 group-hover:w-full" />
+                        <span className={cn(
+                          "absolute -bottom-1 left-0 h-px bg-gradient-to-r from-accent-purple to-accent-blue transition-all duration-300",
+                          isActive(link.href) ? "w-full" : "w-0 group-hover:w-full"
+                        )} />
                       </Link>
                     </li>
                   ))}
@@ -142,9 +184,9 @@ export const Footer = () => {
             </div>
             
             <div className="flex items-center space-x-6 text-xs font-medium">
-              <Link to="/privacy" className="text-slate-500 hover:text-white transition-colors">Privacy Policy</Link>
-              <Link to="/terms" className="text-slate-500 hover:text-white transition-colors">Terms of Service</Link>
-              <Link to="/contact" className="text-slate-500 hover:text-white transition-colors">Support</Link>
+              <Link to="/privacy" className={cn("transition-colors", isActive('/privacy') ? "text-white" : "text-slate-500 hover:text-white")}>Privacy Policy</Link>
+              <Link to="/terms" className={cn("transition-colors", isActive('/terms') ? "text-white" : "text-slate-500 hover:text-white")}>Terms of Service</Link>
+              <Link to="/contact" className={cn("transition-colors", isActive('/contact') ? "text-white" : "text-slate-500 hover:text-white")}>Support</Link>
             </div>
           </motion.div>
         </div>

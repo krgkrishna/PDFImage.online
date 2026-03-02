@@ -86,12 +86,17 @@ export const Contact = () => {
                 </div>
                 <h3 className="text-3xl font-bold mb-4">Message Sent!</h3>
                 <p className="text-slate-400 mb-8">Thank you for reaching out. We'll respond shortly.</p>
-                <button 
-                  onClick={() => setIsSuccess(false)}
-                  className="btn-primary px-8"
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  Send Another Message
-                </button>
+                  <button 
+                    onClick={() => setIsSuccess(false)}
+                    className="btn-primary px-10 py-3 font-bold tracking-widest uppercase"
+                  >
+                    Send Another Message
+                  </button>
+                </motion.div>
               </motion.div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -113,23 +118,28 @@ export const Contact = () => {
                   <label className="block text-sm font-medium text-slate-400 mb-2">Message</label>
                   <textarea required rows={5} className="input-field resize-none" placeholder="Your message here..."></textarea>
                 </div>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="btn-primary w-full flex items-center justify-center py-4"
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-5 h-5 mr-2" />
-                      Send Message
-                    </>
-                  )}
-                </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="btn-primary w-full flex items-center justify-center py-4 text-lg font-bold tracking-widest uppercase"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-5 h-5 mr-2" />
+                        Send Message
+                      </>
+                    )}
+                  </button>
+                </motion.div>
               </form>
             )}
           </motion.div>

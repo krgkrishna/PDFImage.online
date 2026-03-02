@@ -9,39 +9,47 @@ export async function unlockPdf(file: File, password?: string) {
       password,
       ignoreEncryption: false 
     } as any);
+    
+    // We save it to remove the encryption
     const savedBytes = await pdfDoc.save();
     return new Blob([savedBytes], { type: 'application/pdf' });
   } catch (error: any) {
-    if (error.message.includes('password')) {
-      throw new Error('Incorrect password. Please try again.');
+    if (error.message?.includes('password') || error.message?.includes('Encrypted')) {
+      throw new Error('Incorrect password or PDF is encrypted.');
     }
-    throw new Error('Failed to unlock PDF. The file might be corrupted or not encrypted.');
+    throw new Error('Failed to unlock PDF. The file might be corrupted.');
   }
 }
 
-export async function compressPdf(file: File) {
-  const arrayBuffer = await file.arrayBuffer();
-  const pdfDoc = await PDFDocument.load(arrayBuffer);
-  
-  // Create a new document to copy pages into (often reduces size)
-  const compressedDoc = await PDFDocument.create();
-  const pages = await compressedDoc.copyPages(pdfDoc, pdfDoc.getPageIndices());
-  pages.forEach((page) => compressedDoc.addPage(page));
-  
-  // Save with optimizations
-  const savedBytes = await compressedDoc.save({ 
-    useObjectStreams: true,
-    addDefaultPage: false
-  });
-  
-  const originalSize = file.size;
-  const compressedSize = savedBytes.length;
-  
-  if (compressedSize >= originalSize) {
-    throw new Error('This PDF is already highly optimized. No further compression possible.');
+export async function compressPdf(file: File, level: 'low' | 'medium' | 'high' = 'medium') {
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdfDoc = await PDFDocument.load(arrayBuffer);
+    
+    // Compression strategy:
+    // 1. Use object streams
+    // 2. We could potentially downscale images if we had a more complex implementation
+    // For now, we'll use the built-in optimizations of pdf-lib
+    
+    const savedBytes = await pdfDoc.save({
+      useObjectStreams: true,
+      addDefaultPage: false,
+      updateFieldAppearances: false,
+    });
+
+    const originalSize = file.size;
+    const compressedSize = savedBytes.length;
+    
+    // If the "compressed" version is actually larger (can happen with small files),
+    // we return the original or a slightly modified version.
+    if (compressedSize >= originalSize && level === 'low') {
+       return new Blob([arrayBuffer], { type: 'application/pdf' });
+    }
+
+    return new Blob([savedBytes], { type: 'application/pdf' });
+  } catch (error) {
+    throw new Error('Failed to compress PDF.');
   }
-  
-  return new Blob([savedBytes], { type: 'application/pdf' });
 }
 
 export async function imagesToPdf(files: File[]) {
