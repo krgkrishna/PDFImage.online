@@ -94,10 +94,10 @@ export const Navbar = () => {
       "fixed top-0 left-0 right-0 transition-all duration-300 border-b",
       isOpen ? "z-[9999]" : "z-50",
       scrolled 
-        ? "bg-navy-900/80 backdrop-blur-xl border-white/10 py-3" 
-        : "bg-transparent border-transparent py-5"
+        ? "bg-navy-900/80 backdrop-blur-xl border-white/10 py-2.5" 
+        : "bg-transparent border-transparent py-4"
     )}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-8 lg:px-10">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group relative">

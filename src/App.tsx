@@ -16,12 +16,16 @@ import { About } from './pages/About';
 import { Contact } from './pages/Contact';
 import { Privacy } from './pages/Privacy';
 import { Terms } from './pages/Terms';
+import { CookiePolicy } from './pages/CookiePolicy';
+import { Security } from './pages/Security';
+import { Blog } from './pages/Blog';
+import { Careers } from './pages/Careers';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Simple placeholder for other tools to keep the app functional
 const Placeholder = ({ title }: { title: string }) => (
   <div className="pt-40 pb-20 text-center min-h-[60vh]">
-    <h1 className="text-5xl font-black mb-6 bg-clip-text text-transparent bg-gradient-to-r from-accent-purple to-accent-blue">{title}</h1>
+    <h1 className="text-5xl font-black mb-6 bg-clip-text text-transparent bg-gradient-to-r from-accent-purple to-accent-blue tracking-tight">{title}</h1>
     <p className="text-slate-400 text-lg max-w-2xl mx-auto">This feature is coming soon in the production version of PDFImage Online.</p>
     <Link to="/" className="btn-primary mt-10 inline-block px-8 py-3">Back to Home</Link>
   </div>
@@ -53,14 +57,14 @@ export default function App() {
               {/* Company */}
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
-              <Route path="/blog" element={<Placeholder title="Our Blog" />} />
-              <Route path="/careers" element={<Placeholder title="Careers" />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/careers" element={<Careers />} />
               
               {/* Legal */}
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
-              <Route path="/cookies" element={<Placeholder title="Cookie Policy" />} />
-              <Route path="/security" element={<Placeholder title="Security" />} />
+              <Route path="/cookies" element={<CookiePolicy />} />
+              <Route path="/security" element={<Security />} />
             </Routes>
           </AnimatePresence>
         </main>

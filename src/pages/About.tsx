@@ -4,13 +4,13 @@ import { Shield, Zap, Heart, Users, Globe } from 'lucide-react';
 
 export const About = () => {
   return (
-    <div className="pt-32 pb-20 max-w-5xl mx-auto px-4">
+    <div className="pt-32 pb-20 max-w-6xl mx-auto px-4 sm:px-8 lg:px-10">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-16"
       >
-        <h1 className="text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-accent-purple to-accent-blue">
+        <h1 className="text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-accent-purple to-accent-blue tracking-tight">
           About PDFImage Online
         </h1>
         <p className="text-slate-400 text-lg max-w-3xl mx-auto">
@@ -24,7 +24,7 @@ export const About = () => {
           initial={{ opacity: 0, x: -20 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
-          className="space-y-6"
+          className="space-y-6 text-center md:text-left"
         >
           <h2 className="text-3xl font-bold">Our Philosophy</h2>
           <p className="text-slate-400 leading-relaxed">
@@ -65,9 +65,9 @@ export const About = () => {
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="glass-card p-12 text-center bg-gradient-to-br from-accent-purple/5 to-accent-blue/5"
+        className="glass-card p-12 text-center bg-gradient-to-br from-accent-purple/5 to-accent-blue/5 flex flex-col items-center"
       >
-        <Heart className="w-12 h-12 text-red-500 mx-auto mb-6" />
+        <Heart className="w-12 h-12 text-red-500 mb-6" />
         <h3 className="text-2xl font-bold mb-4">Built with Passion</h3>
         <p className="text-slate-400 max-w-2xl mx-auto">
           PDFImage Online is a labor of love, designed to help students, professionals, and small business owners 

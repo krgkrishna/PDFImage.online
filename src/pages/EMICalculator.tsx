@@ -31,8 +31,8 @@ export const EMICalculator = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Inputs */}
         <div className="lg:col-span-5 space-y-6">
-          <div className="glass-card p-8">
-            <h3 className="text-xl font-bold mb-8 flex items-center">
+          <div className="glass-card p-8 text-center">
+            <h3 className="text-xl font-bold mb-8 flex items-center justify-center">
               <Info className="w-5 h-5 mr-2 text-accent-purple" />
               Loan Details
             </h3>
@@ -43,7 +43,7 @@ export const EMICalculator = () => {
                 <div className="flex justify-between items-end">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Loan Amount</label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-bold">$</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-bold">₹</span>
                     <input
                       type="number"
                       value={principal}
@@ -62,8 +62,8 @@ export const EMICalculator = () => {
                   className="w-full h-2 bg-white/5 rounded-lg appearance-none cursor-pointer accent-accent-purple"
                 />
                 <div className="flex justify-between text-[10px] font-bold text-slate-600 uppercase tracking-widest">
-                  <span>$10k</span>
-                  <span>$10M</span>
+                  <span>₹10k</span>
+                  <span>₹10M</span>
                 </div>
               </div>
 
@@ -140,7 +140,12 @@ export const EMICalculator = () => {
                 <Wallet className="text-accent-purple w-6 h-6" />
               </div>
               <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-2">Monthly EMI</p>
-              <p className="text-2xl font-black text-white tracking-tight">{formatCurrency(results.monthlyEmi)}</p>
+              <p 
+                className="font-black text-white tracking-tight break-words overflow-wrap-anywhere"
+                style={{ fontSize: 'clamp(20px, 5vw, 32px)' }}
+              >
+                {formatCurrency(results.monthlyEmi)}
+              </p>
             </motion.div>
             
             <motion.div 
@@ -153,7 +158,12 @@ export const EMICalculator = () => {
                 <TrendingUp className="text-orange-400 w-6 h-6" />
               </div>
               <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-2">Total Interest</p>
-              <p className="text-2xl font-black text-white tracking-tight">{formatCurrency(results.totalInterest)}</p>
+              <p 
+                className="font-black text-white tracking-tight break-words overflow-wrap-anywhere"
+                style={{ fontSize: 'clamp(20px, 5vw, 32px)' }}
+              >
+                {formatCurrency(results.totalInterest)}
+              </p>
             </motion.div>
             
             <motion.div 
@@ -166,7 +176,12 @@ export const EMICalculator = () => {
                 <PieChart className="text-emerald-400 w-6 h-6" />
               </div>
               <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-2">Total Payment</p>
-              <p className="text-2xl font-black text-white tracking-tight">{formatCurrency(results.totalPayment)}</p>
+              <p 
+                className="font-black text-white tracking-tight break-words overflow-wrap-anywhere"
+                style={{ fontSize: 'clamp(20px, 5vw, 32px)' }}
+              >
+                {formatCurrency(results.totalPayment)}
+              </p>
             </motion.div>
           </div>
 
@@ -174,9 +189,9 @@ export const EMICalculator = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="glass-card p-8"
+            className="glass-card p-8 text-center"
           >
-            <h3 className="text-xl font-bold mb-8 flex items-center">
+            <h3 className="text-xl font-bold mb-8 flex items-center justify-center">
               <CalcIcon className="mr-3 w-6 h-6 text-accent-purple" />
               Repayment Breakdown
             </h3>
@@ -199,19 +214,24 @@ export const EMICalculator = () => {
               </div>
 
               <div className="pt-4 mt-4 border-t border-white/10">
-                <div className="flex justify-between items-center p-6 rounded-3xl bg-gradient-to-br from-accent-purple/20 to-accent-blue/20 border border-white/10">
-                  <div>
+                <div className="flex flex-col items-center text-center p-6 rounded-3xl bg-gradient-to-br from-accent-purple/20 to-accent-blue/20 border border-white/10">
+                  <div className="mb-4">
                     <p className="text-[10px] font-bold text-accent-purple uppercase tracking-[0.2em] mb-1">Total Repayment</p>
                     <p className="text-slate-200 text-sm">Principal + Interest</p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-3xl font-black text-white tracking-tight">{formatCurrency(results.totalPayment)}</p>
+                  <div className="w-full">
+                    <p 
+                      className="font-black text-white tracking-tight break-words overflow-wrap-anywhere"
+                      style={{ fontSize: 'clamp(20px, 5vw, 32px)' }}
+                    >
+                      {formatCurrency(results.totalPayment)}
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="mt-8 p-4 rounded-2xl bg-blue-500/5 border border-blue-500/10 flex items-start">
+            <div className="mt-8 p-4 rounded-2xl bg-blue-500/5 border border-blue-500/10 flex items-start text-left">
               <Info className="w-5 h-5 text-blue-400 mr-3 mt-0.5 flex-shrink-0" />
               <p className="text-xs text-slate-400 leading-relaxed">
                 This calculation is an estimate. Actual bank rates and processing fees may vary. 

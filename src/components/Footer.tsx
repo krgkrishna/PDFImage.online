@@ -18,6 +18,8 @@ export const Footer = () => {
       { name: 'Image to PDF', href: '/image-to-pdf' },
       { name: 'EMI Calculator', href: '/emi' },
       { name: 'GST Calculator', href: '/gst' },
+      { name: 'BMI Calculator', href: '/bmi' },
+      { name: 'Age Calculator', href: '/age' },
     ],
     company: [
       { name: 'About Us', href: '/about' },
@@ -88,7 +90,7 @@ export const Footer = () => {
             </div>
 
             {/* Links Columns */}
-            <div className="grid grid-cols-2 md:grid-cols-3 col-span-1 md:col-span-3 gap-8">
+            <div className="grid grid-cols-2 sm:grid-cols-3 col-span-1 md:col-span-3 gap-8">
               <div>
                 <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-6">Tools</h4>
                 <ul className="space-y-3">

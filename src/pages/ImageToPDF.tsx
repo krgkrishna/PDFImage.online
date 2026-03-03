@@ -92,8 +92,8 @@ export const ImageToPDF = () => {
       </motion.div>
 
       <div className="glass-card overflow-hidden mb-12">
-        <div className="p-8">
-          <div className="border-2 border-dashed border-white/10 rounded-3xl p-12 text-center hover:border-accent-blue/50 hover:bg-accent-blue/5 transition-all cursor-pointer relative group mb-8">
+        <div className="p-6 sm:p-8">
+          <div className="border-2 border-dashed border-white/10 rounded-3xl p-8 sm:p-10 text-center hover:border-accent-blue/50 hover:bg-accent-blue/5 transition-all cursor-pointer relative group mb-8">
             <input
               type="file"
               multiple
@@ -102,10 +102,10 @@ export const ImageToPDF = () => {
               className="absolute inset-0 opacity-0 cursor-pointer z-10"
             />
             <div className="relative z-0">
-              <div className="w-20 h-20 bg-accent-blue/10 text-accent-blue rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-500">
-                <Plus className="w-10 h-10" />
+              <div className="w-16 h-16 bg-accent-blue/10 text-accent-blue rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-500">
+                <Plus className="w-8 h-8" />
               </div>
-              <h3 className="text-2xl font-bold mb-2 text-white">Add Images</h3>
+              <h3 className="text-xl font-bold mb-1 text-white">Add Images</h3>
               <p className="text-slate-400 mb-2 text-sm">Supports JPG, PNG, WebP</p>
               <p className="text-[10px] uppercase tracking-widest text-slate-600 font-bold">Secure client-side conversion</p>
             </div>
@@ -228,7 +228,7 @@ export const ImageToPDF = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.1 }}
-            className="p-6 rounded-3xl bg-white/5 border border-white/10"
+            className="p-6 rounded-3xl bg-white/5 border border-white/10 text-center flex flex-col items-center"
           >
             <item.icon className="w-8 h-8 text-accent-blue mb-4" />
             <h4 className="text-lg font-bold text-white mb-2">{item.title}</h4>

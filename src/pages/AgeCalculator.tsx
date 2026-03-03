@@ -90,8 +90,8 @@ export const AgeCalculator = () => {
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-12"
       >
-        <h1 className="text-4xl font-bold mb-4">Age Calculator</h1>
-        <p className="text-slate-400">Calculate your exact age and see interesting life statistics.</p>
+        <h1 className="text-4xl font-bold mb-4 text-center">Age Calculator</h1>
+        <p className="text-slate-400 text-center">Calculate your exact age and see interesting life statistics.</p>
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

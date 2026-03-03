@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, FileText, Download, Loader2, AlertCircle, Zap, CheckCircle2, X, BarChart3 } from 'lucide-react';
 import { compressPdf } from '../lib/pdf';
 
-type CompressionLevel = 'low' | 'medium' | 'high';
+type CompressionLevel = 'low' | 'medium' | 'high' | 'custom';
 
 export const CompressPDF = () => {
   const [file, setFile] = React.useState<File | null>(null);
@@ -13,6 +13,17 @@ export const CompressPDF = () => {
   const [newSize, setNewSize] = React.useState(0);
   const [error, setError] = React.useState('');
   const [level, setLevel] = React.useState<CompressionLevel>('medium');
+  const [customPercentage, setCustomPercentage] = React.useState(60);
+
+  const abortControllerRef = React.useRef<AbortController | null>(null);
+
+  React.useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -20,6 +31,9 @@ export const CompressPDF = () => {
       if (selectedFile.type !== 'application/pdf') {
         setError('Please select a valid PDF file.');
         return;
+      }
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
       }
       setFile(selectedFile);
       setOriginalSize(selectedFile.size);
@@ -32,11 +46,29 @@ export const CompressPDF = () => {
     if (!file) return;
     setIsProcessing(true);
     setError('');
+
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
+
     try {
-      const compressed = await compressPdf(file, level);
+      const compressed = await compressPdf(file, level, customPercentage, abortControllerRef.current.signal);
       setResult(compressed);
       setNewSize(compressed.size);
+
+      // Automatic download
+      const url = URL.createObjectURL(compressed);
+      const a = document.createElement('a');
+      a.href = url;
+      const originalName = file.name.replace(/\.[^/.]+$/, "");
+      a.download = `${originalName}-compressed.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     } catch (err: any) {
+      if (err.name === 'AbortError') return;
       setError(err.message || 'Failed to compress PDF');
     } finally {
       setIsProcessing(false);
@@ -48,7 +80,8 @@ export const CompressPDF = () => {
     const url = URL.createObjectURL(result);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `compressed_${file.name}`;
+    const originalName = file.name.replace(/\.[^/.]+$/, "");
+    a.download = `${originalName}-compressed.pdf`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -88,9 +121,9 @@ export const CompressPDF = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="p-12 text-center"
+              className="p-8 sm:p-12 text-center"
             >
-              <div className="border-2 border-dashed border-white/10 rounded-3xl p-12 hover:border-accent-purple/50 hover:bg-accent-purple/5 transition-all cursor-pointer relative group">
+              <div className="border-2 border-dashed border-white/10 rounded-3xl p-8 sm:p-10 hover:border-accent-purple/50 hover:bg-accent-purple/5 transition-all cursor-pointer relative group">
                 <input
                   type="file"
                   accept=".pdf"
@@ -98,11 +131,11 @@ export const CompressPDF = () => {
                   className="absolute inset-0 opacity-0 cursor-pointer z-10"
                 />
                 <div className="relative z-0">
-                  <div className="w-20 h-20 bg-accent-purple/10 text-accent-purple rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-500">
-                    <Upload className="w-10 h-10" />
+                  <div className="w-16 h-16 bg-accent-purple/10 text-accent-purple rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-500">
+                    <Upload className="w-8 h-8" />
                   </div>
-                  <h3 className="text-2xl font-bold mb-2 text-white">Choose PDF file</h3>
-                  <p className="text-slate-400 mb-2">or drag and drop it here</p>
+                  <h3 className="text-xl font-bold mb-1 text-white">Choose PDF file</h3>
+                  <p className="text-slate-400 mb-2 text-sm">or drag and drop it here</p>
                   <p className="text-[10px] uppercase tracking-widest text-slate-600 font-bold">Max file size: 50MB</p>
                 </div>
               </div>
@@ -158,6 +191,32 @@ export const CompressPDF = () => {
                           </p>
                         </button>
                       ))}
+                    </div>
+
+                    <div className="space-y-4 pt-4">
+                      <div className="flex justify-between items-center">
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">
+                          Custom Compression: {customPercentage}%
+                        </label>
+                        {level === 'custom' && (
+                          <span className="text-[10px] font-bold text-accent-purple uppercase tracking-widest">Active</span>
+                        )}
+                      </div>
+                      <input
+                        type="range"
+                        min="10"
+                        max="90"
+                        value={customPercentage}
+                        onChange={(e) => {
+                          setCustomPercentage(Number(e.target.value));
+                          setLevel('custom');
+                        }}
+                        className="w-full h-2 bg-white/5 rounded-lg appearance-none cursor-pointer accent-accent-purple"
+                      />
+                      <div className="flex justify-between text-[10px] font-bold text-slate-600 uppercase tracking-widest">
+                        <span>10% (High Quality)</span>
+                        <span>90% (Max Compression)</span>
+                      </div>
                     </div>
                   </div>
 
@@ -264,7 +323,7 @@ export const CompressPDF = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.1 }}
-            className="p-6 rounded-3xl bg-white/5 border border-white/10"
+            className="p-6 rounded-3xl bg-white/5 border border-white/10 text-center flex flex-col items-center"
           >
             <item.icon className="w-8 h-8 text-accent-purple mb-4" />
             <h4 className="text-lg font-bold text-white mb-2">{item.title}</h4>

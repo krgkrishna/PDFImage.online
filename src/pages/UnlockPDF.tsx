@@ -10,12 +10,25 @@ export const UnlockPDF = () => {
   const [error, setError] = React.useState('');
   const [result, setResult] = React.useState<Blob | null>(null);
 
+  const abortControllerRef = React.useRef<AbortController | null>(null);
+
+  React.useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
       if (selectedFile.type !== 'application/pdf') {
         setError('Please select a valid PDF file.');
         return;
+      }
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
       }
       setFile(selectedFile);
       setError('');
@@ -27,10 +40,28 @@ export const UnlockPDF = () => {
     if (!file) return;
     setIsProcessing(true);
     setError('');
+
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
+
     try {
-      const unlocked = await unlockPdf(file, password);
+      const unlocked = await unlockPdf(file, password, abortControllerRef.current.signal);
       setResult(unlocked);
+      
+      // Automatic download
+      const url = URL.createObjectURL(unlocked);
+      const a = document.createElement('a');
+      a.href = url;
+      const originalName = file.name.replace(/\.[^/.]+$/, "");
+      a.download = `${originalName}-unlocked.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     } catch (err: any) {
+      if (err.name === 'AbortError') return;
       setError(err.message || 'Failed to unlock PDF. Please check your password.');
     } finally {
       setIsProcessing(false);
@@ -42,7 +73,8 @@ export const UnlockPDF = () => {
     const url = URL.createObjectURL(result);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `unlocked_${file.name}`;
+    const originalName = file.name.replace(/\.[^/.]+$/, "");
+    a.download = `${originalName}-unlocked.pdf`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -81,9 +113,9 @@ export const UnlockPDF = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="p-12 text-center"
+              className="p-8 sm:p-12 text-center"
             >
-              <div className="border-2 border-dashed border-white/10 rounded-3xl p-12 hover:border-accent-purple/50 hover:bg-accent-purple/5 transition-all cursor-pointer relative group">
+              <div className="border-2 border-dashed border-white/10 rounded-3xl p-8 sm:p-10 hover:border-accent-purple/50 hover:bg-accent-purple/5 transition-all cursor-pointer relative group">
                 <input
                   type="file"
                   accept=".pdf"
@@ -91,11 +123,11 @@ export const UnlockPDF = () => {
                   className="absolute inset-0 opacity-0 cursor-pointer z-10"
                 />
                 <div className="relative z-0">
-                  <div className="w-20 h-20 bg-accent-purple/10 text-accent-purple rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-500">
-                    <Upload className="w-10 h-10" />
+                  <div className="w-16 h-16 bg-accent-purple/10 text-accent-purple rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-500">
+                    <Upload className="w-8 h-8" />
                   </div>
-                  <h3 className="text-2xl font-bold mb-2 text-white">Choose PDF file</h3>
-                  <p className="text-slate-400 mb-2">or drag and drop it here</p>
+                  <h3 className="text-xl font-bold mb-1 text-white">Choose PDF file</h3>
+                  <p className="text-slate-400 mb-2 text-sm">or drag and drop it here</p>
                   <p className="text-[10px] uppercase tracking-widest text-slate-600 font-bold">Max file size: 50MB</p>
                 </div>
               </div>
@@ -233,7 +265,7 @@ export const UnlockPDF = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.1 }}
-            className="p-6 rounded-3xl bg-white/5 border border-white/10"
+            className="p-6 rounded-3xl bg-white/5 border border-white/10 text-center flex flex-col items-center"
           >
             <item.icon className="w-8 h-8 text-accent-purple mb-4" />
             <h4 className="text-lg font-bold text-white mb-2">{item.title}</h4>

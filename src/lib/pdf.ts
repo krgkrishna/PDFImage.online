@@ -1,54 +1,102 @@
 import { PDFDocument } from 'pdf-lib';
 import imageCompression from 'browser-image-compression';
 
-export async function unlockPdf(file: File, password?: string) {
-  const arrayBuffer = await file.arrayBuffer();
+const API_KEY = import.meta.env.VITE_PDFCO_API_KEY;
+
+const isApiKeyValid = () => {
+  return API_KEY && API_KEY.trim() !== '';
+};
+
+export async function unlockPdf(file: File, password?: string, signal?: AbortSignal) {
+  if (!isApiKeyValid()) throw new Error('Service configuration error. Please try again later.');
+
+  const formData = new FormData();
+  formData.append('file', file);
+  if (password) formData.append('password', password);
+
   try {
-    // @ts-ignore - pdf-lib types sometimes lag behind or have strict load options
-    const pdfDoc = await PDFDocument.load(arrayBuffer, { 
-      password,
-      ignoreEncryption: false 
-    } as any);
+    const response = await fetch('https://api.pdf.co/v1/pdf/security/remove-password', {
+      method: 'POST',
+      headers: { 'x-api-key': API_KEY },
+      body: formData,
+      signal
+    });
+
+    const data = await response.json();
     
-    // We save it to remove the encryption
-    const savedBytes = await pdfDoc.save();
-    return new Blob([savedBytes], { type: 'application/pdf' });
-  } catch (error: any) {
-    if (error.message?.includes('password') || error.message?.includes('Encrypted')) {
-      throw new Error('Incorrect password or PDF is encrypted.');
+    if (data.error) {
+      const msg = data.message?.toLowerCase() || '';
+      if (msg.includes('password')) {
+        throw new Error('Incorrect password. Please try again.');
+      }
+      if (data.status === 401 || data.status === 403 || msg.includes('limit') || msg.includes('credit')) {
+        throw new Error('Service limit reached. Please try again later.');
+      }
+      if (msg.includes('large') || msg.includes('size')) {
+        throw new Error('File is too large for the current service plan.');
+      }
+      throw new Error(data.message || 'Failed to unlock PDF.');
     }
-    throw new Error('Failed to unlock PDF. The file might be corrupted.');
+
+    const fileResponse = await fetch(data.url);
+    if (!fileResponse.ok) throw new Error('Failed to download processed file.');
+    const blob = await fileResponse.blob();
+    return blob;
+  } catch (error: any) {
+    if (error.name === 'AbortError') throw error;
+    throw error;
   }
 }
 
-export async function compressPdf(file: File, level: 'low' | 'medium' | 'high' = 'medium') {
+export async function compressPdf(
+  file: File, 
+  level: 'low' | 'medium' | 'high' | 'custom' = 'medium',
+  customPercentage: number = 60,
+  signal?: AbortSignal
+) {
+  if (!isApiKeyValid()) throw new Error('Service configuration error. Please try again later.');
+
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  let profile = 'ebook';
+  if (level === 'low') profile = 'web';
+  if (level === 'high') profile = 'screen';
+  
+  if (level === 'custom') {
+    formData.append('profiles', `{"imageQuality": ${customPercentage}}`);
+  } else {
+    formData.append('profiles', profile);
+  }
+
   try {
-    const arrayBuffer = await file.arrayBuffer();
-    const pdfDoc = await PDFDocument.load(arrayBuffer);
-    
-    // Compression strategy:
-    // 1. Use object streams
-    // 2. We could potentially downscale images if we had a more complex implementation
-    // For now, we'll use the built-in optimizations of pdf-lib
-    
-    const savedBytes = await pdfDoc.save({
-      useObjectStreams: true,
-      addDefaultPage: false,
-      updateFieldAppearances: false,
+    const response = await fetch('https://api.pdf.co/v1/pdf/optimize', {
+      method: 'POST',
+      headers: { 'x-api-key': API_KEY },
+      body: formData,
+      signal
     });
 
-    const originalSize = file.size;
-    const compressedSize = savedBytes.length;
+    const data = await response.json();
     
-    // If the "compressed" version is actually larger (can happen with small files),
-    // we return the original or a slightly modified version.
-    if (compressedSize >= originalSize && level === 'low') {
-       return new Blob([arrayBuffer], { type: 'application/pdf' });
+    if (data.error) {
+      const msg = data.message?.toLowerCase() || '';
+      if (data.status === 401 || data.status === 403 || msg.includes('limit') || msg.includes('credit')) {
+        throw new Error('Service limit reached. Please try again later.');
+      }
+      if (msg.includes('large') || msg.includes('size')) {
+        throw new Error('File is too large for the current service plan.');
+      }
+      throw new Error(data.message || 'Failed to compress PDF.');
     }
 
-    return new Blob([savedBytes], { type: 'application/pdf' });
-  } catch (error) {
-    throw new Error('Failed to compress PDF.');
+    const fileResponse = await fetch(data.url);
+    if (!fileResponse.ok) throw new Error('Failed to download processed file.');
+    const blob = await fileResponse.blob();
+    return blob;
+  } catch (error: any) {
+    if (error.name === 'AbortError') throw error;
+    throw error;
   }
 }
 

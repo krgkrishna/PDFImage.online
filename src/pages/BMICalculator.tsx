@@ -213,7 +213,7 @@ export const BMICalculator = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.1 }}
-            className="p-6 rounded-3xl bg-white/5 border border-white/10"
+            className="p-6 rounded-3xl bg-white/5 border border-white/10 text-center flex flex-col items-center"
           >
             <item.icon className="w-8 h-8 text-accent-purple mb-4" />
             <h4 className="text-lg font-bold text-white mb-2">{item.title}</h4>

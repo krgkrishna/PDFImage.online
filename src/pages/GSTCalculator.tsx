@@ -33,9 +33,9 @@ export const GSTCalculator = () => {
         <motion.div 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="glass-card p-8"
+          className="glass-card p-8 text-center"
         >
-          <h3 className="text-xl font-bold mb-8 flex items-center">
+          <h3 className="text-xl font-bold mb-8 flex items-center justify-center">
             <CalcIcon className="w-5 h-5 mr-2 text-accent-purple" />
             Tax Parameters
           </h3>
@@ -44,7 +44,7 @@ export const GSTCalculator = () => {
             <div className="space-y-4">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-widest block">Base Amount</label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">$</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">₹</span>
                 <input
                   type="number"
                   value={amount}
@@ -112,40 +112,53 @@ export const GSTCalculator = () => {
           animate={{ opacity: 1, x: 0 }}
           className="space-y-6"
         >
-          <div className="glass-card p-8 bg-gradient-to-br from-accent-purple/10 to-accent-blue/10 border-accent-purple/20">
-            <h3 className="text-xl font-bold mb-8 flex items-center">
+          <div className="glass-card p-8 bg-gradient-to-br from-accent-purple/10 to-accent-blue/10 border-accent-purple/20 text-center">
+            <h3 className="text-xl font-bold mb-8 flex items-center justify-center">
               <Receipt className="w-5 h-5 mr-2 text-accent-purple" />
               Tax Invoice Summary
             </h3>
             
             <div className="space-y-6">
-              <div className="flex justify-between items-center p-4 rounded-2xl bg-white/[0.02] border border-white/5">
-                <span className="text-slate-400 font-medium">Net Amount</span>
-                <span className="font-bold text-white">{formatCurrency(results.originalAmount)}</span>
+              <div className="flex flex-col items-center p-4 rounded-2xl bg-white/[0.02] border border-white/5">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Net Amount</span>
+                <span 
+                  className="font-bold text-white break-words overflow-wrap-anywhere"
+                  style={{ fontSize: 'clamp(18px, 4.5vw, 24px)' }}
+                >
+                  {formatCurrency(results.originalAmount)}
+                </span>
               </div>
               
-              <div className="flex justify-between items-center p-4 rounded-2xl bg-white/[0.02] border border-white/5">
-                <div className="flex flex-col">
-                  <span className="text-slate-400 font-medium">GST Amount ({rate}%)</span>
-                  <span className="text-[10px] text-slate-600 font-bold uppercase tracking-widest">CGST + SGST</span>
-                </div>
-                <span className="font-bold text-accent-purple">+{formatCurrency(results.gstAmount)}</span>
+              <div className="flex flex-col items-center p-4 rounded-2xl bg-white/[0.02] border border-white/5">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">GST Amount ({rate}%)</span>
+                <span 
+                  className="font-bold text-accent-purple break-words overflow-wrap-anywhere"
+                  style={{ fontSize: 'clamp(18px, 4.5vw, 24px)' }}
+                >
+                  +{formatCurrency(results.gstAmount)}
+                </span>
+                <span className="text-[10px] text-slate-600 font-bold uppercase tracking-widest mt-1">CGST + SGST</span>
               </div>
 
               <div className="pt-4 mt-4 border-t border-white/10">
-                <div className="flex justify-between items-center p-6 rounded-3xl bg-white/5 border border-white/10">
-                  <div>
+                <div className="flex flex-col items-center text-center p-6 rounded-3xl bg-white/5 border border-white/10">
+                  <div className="mb-4">
                     <p className="text-[10px] font-bold text-accent-purple uppercase tracking-[0.2em] mb-1">Total Amount</p>
                     <p className="text-slate-200 text-sm">Inclusive of all taxes</p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-3xl font-black text-white tracking-tight">{formatCurrency(results.totalAmount)}</p>
+                  <div className="w-full">
+                    <p 
+                      className="font-black text-white tracking-tight break-words overflow-wrap-anywhere"
+                      style={{ fontSize: 'clamp(18px, 4.5vw, 30px)' }}
+                    >
+                      {formatCurrency(results.totalAmount)}
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="mt-8 p-4 rounded-2xl bg-accent-purple/5 border border-accent-purple/10 flex items-start">
+            <div className="mt-8 p-4 rounded-2xl bg-accent-purple/5 border border-accent-purple/10 flex items-start text-left">
               <Info className="w-5 h-5 text-accent-purple mr-3 mt-0.5 flex-shrink-0" />
               <p className="text-xs text-slate-400 leading-relaxed">
                 {isInclusive 
@@ -156,16 +169,16 @@ export const GSTCalculator = () => {
           </div>
 
           {/* Components Breakdown */}
-          <div className="glass-card p-6">
+          <div className="glass-card p-6 text-center">
             <h4 className="text-sm font-bold text-white mb-4 uppercase tracking-widest">Tax Components</h4>
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">CGST ({(rate/2).toFixed(1)}%)</p>
-                <p className="text-lg font-bold text-white">{formatCurrency(results.gstAmount / 2)}</p>
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/5 text-center flex flex-col justify-center min-h-[100px]">
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">CGST ({(rate/2).toFixed(1)}%)</p>
+                <p className="text-lg font-bold text-white break-words overflow-wrap-anywhere">{formatCurrency(results.gstAmount / 2)}</p>
               </div>
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">SGST ({(rate/2).toFixed(1)}%)</p>
-                <p className="text-lg font-bold text-white">{formatCurrency(results.gstAmount / 2)}</p>
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/5 text-center flex flex-col justify-center min-h-[100px]">
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">SGST ({(rate/2).toFixed(1)}%)</p>
+                <p className="text-lg font-bold text-white break-words overflow-wrap-anywhere">{formatCurrency(results.gstAmount / 2)}</p>
               </div>
             </div>
           </div>
@@ -197,7 +210,7 @@ export const GSTCalculator = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.1 }}
-            className="p-6 rounded-3xl bg-white/5 border border-white/10"
+            className="p-6 rounded-3xl bg-white/5 border border-white/10 text-center flex flex-col items-center"
           >
             <item.icon className="w-8 h-8 text-accent-purple mb-4" />
             <h4 className="text-lg font-bold text-white mb-2">{item.title}</h4>

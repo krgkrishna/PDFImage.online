@@ -27,13 +27,13 @@ export const Privacy = () => {
   ];
 
   return (
-    <div className="pt-32 pb-20 max-w-4xl mx-auto px-4">
+    <div className="pt-32 pb-20 max-w-6xl mx-auto px-4 sm:px-8 lg:px-10">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-16"
       >
-        <h1 className="text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-accent-purple to-accent-blue">
+        <h1 className="text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-accent-purple to-accent-blue tracking-tight">
           Privacy Policy
         </h1>
         <p className="text-slate-400 text-lg">
@@ -49,10 +49,10 @@ export const Privacy = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: index * 0.1 }}
-            className="glass-card p-8"
+            className="glass-card p-8 text-center flex flex-col items-center"
           >
-            <div className="flex items-center mb-4">
-              <div className="w-10 h-10 bg-accent-purple/10 rounded-lg flex items-center justify-center mr-4">
+            <div className="flex flex-col items-center mb-4">
+              <div className="w-10 h-10 bg-accent-purple/10 rounded-lg flex items-center justify-center mb-4">
                 <section.icon className="text-accent-purple w-5 h-5" />
               </div>
               <h2 className="text-2xl font-bold">{section.title}</h2>
